@@ -522,9 +522,9 @@ class ForgerKimModel:
 
         return output
 
-def main(save_plots: bool = False):
+def main(save_plots: bool = False, t_end: int = 100, num_points: int = 10_000):
     model = ForgerKimModel()
-    t, y = model.simulate(t_end=100, num_points=10_000)
+    t, y = model.simulate(t_end=t_end, num_points=num_points)
 
     if save_plots:
         import matplotlib.pyplot as plt
