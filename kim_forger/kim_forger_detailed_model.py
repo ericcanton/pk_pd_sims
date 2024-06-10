@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.integrate import odeint
+from scipy.integrate import solve_ivp
 
 initial_conditions = [0.787955, 0.210048, 0.558565, 0.416217, 0.804404, 0.193886, 0.39359, 0.599965, 0.404247, 0.589308,
 		4.18947, 0.579108, 8.34963, 1.41168, 12.3735, 4.47054, 31.869, 161.144, 3.76085, 1.09547,
@@ -45,6 +45,29 @@ class ForgerKimModel:
         # If parameter values are provided, update the default values
         if parameter_values:
             self.default_parameters.update(parameter_values)
+    
+    def simulate(self, t_end=10, num_points=1000):
+        """
+        Simulates the model.
+
+        Args:
+            t_end: The end time of the simulation.
+            num_points: The number of time points to simulate.
+
+        Returns:
+            A tuple containing the time points and the state variables.
+        """
+
+        # Time points
+        t = np.linspace(0, t_end, num_points)
+
+        # Initial conditions
+        y0 = initial_conditions
+
+        # Solve the ODE system
+        solution = solve_ivp(self.rhs, (0, t_end), y0, t_eval=t)
+
+        return solution.t, solution.y
 
     def rhs(self, t, y):
         """
@@ -61,6 +84,7 @@ class ForgerKimModel:
         # Unpack state variables and parameters
         GR, G, GrR, Gr, GcR, Gc, GBR, GB, GBRb, GBb, MnPo, McPo, MnPt, McPt, MnRt, McRt, MnRev, McRev, MnRo, McRo, MnB, McB, MnNp, McNp, B, Cl, BC, cyrev, revn, cyrevg, revng, cyrevgp, revngp, cyrevp, revnp, gto, x00001, x00011, x00100, x00110, x00200, x00210, x01000, x01010, x01011, x02000, x02010, x02011, x10000, x10100, x20000, x20010, x20011, x20100, x20110, x20111, x21000, x21010, x21011, x21100, x21110, x21111, x22000, x22010, x22011, x22100, x22110, x22111, x30000, x30100, x30200, x30300, x40000, x40010, x40011, x40100, x40110, x40111, x40200, x40210, x40211, x40300, x40310, x40311, x41000, x41010, x41011, x41100, x41110, x41111, x41200, x41210, x41211, x41300, x41310, x41311, x42000, x42010, x42011, x42100, x42110, x42111, x42200, x42210, x42211, x42300, x42310, x42311, x50000, x50010, x50011, x50100, x50110, x50111, x50200, x50210, x50211, x50300, x50310, x50311, x51000, x51010, x51011, x51100, x51110, x51111, x51200, x51210, x51211, x51300, x51310, x51311, x52000, x52010, x52011, x52100, x52110, x52111, x52200, x52210, x52211, x52300, x52310, x52311, x60000, x60010, x60011, x60100, x60110, x60111, x60200, x60210, x60211, x60300, x60310, x60311, x61000, x61010, x61011, x61100, x61110, x61111, x61200, x61210, x61211, x61300, x61310, x61311, x62000, x62010, x62011, x62100, x62110, x62111, x62200, x62210, x62211, x62300, x62310, x62311 = y
         
+        bin = self.default_parameters['bin']
         unbin = self.default_parameters['unbin']
         unbinr = self.default_parameters['unbinr']
         binr = self.default_parameters['binr']
@@ -314,186 +338,207 @@ class ForgerKimModel:
         x62311_dot = gto*x42311+ar*Nf*x02011*x60310+ar*Nf*x02010*x60311+agp*Nf*x00210*x62111+ac*Nf*x00110*x62211+bbin*Nf*x00011*x62310-dc*x62311-dg*x62311-2*dr*x62311-unbbin*x62311
 
         output = np.zeros_like(y)
-        output[1] = GR_dot
-        output[2] = G_dot
-        output[3] = GrR_dot
-        output[4] = Gr_dot
-        output[5] = GcR_dot
-        output[6] = Gc_dot
-        output[7] = GBR_dot
-        output[8] = GB_dot
-        output[9] = GBRb_dot
-        output[10] = GBb_dot
-        output[11] = MnPo_dot
-        output[12] = McPo_dot
-        output[13] = MnPt_dot
-        output[14] = McPt_dot
-        output[15] = MnRt_dot
-        output[16] = McRt_dot
-        output[17] = MnRev_dot
-        output[18] = McRev_dot
-        output[19] = MnRo_dot
-        output[20] = McRo_dot
-        output[21] = MnB_dot
-        output[22] = McB_dot
-        output[23] = MnNp_dot
-        output[24] = McNp_dot
-        output[25] = B_dot
-        output[26] = Cl_dot
-        output[27] = BC_dot
-        output[28] = cyrev_dot
-        output[29] = revn_dot
-        output[30] = cyrevg_dot
-        output[31] = revng_dot
-        output[32] = cyrevgp_dot
-        output[33] = revngp_dot
-        output[34] = cyrevp_dot
-        output[35] = revnp_dot
-        output[36] = gto_dot
-        output[37] = x00001_dot
-        output[38] = x00011_dot
-        output[39] = x00100_dot
-        output[40] = x00110_dot
-        output[41] = x00200_dot
-        output[42] = x00210_dot
-        output[43] = x01000_dot
-        output[44] = x01010_dot
-        output[45] = x01011_dot
-        output[46] = x02000_dot
-        output[47] = x02010_dot
-        output[48] = x02011_dot
-        output[49] = x10000_dot
-        output[50] = x10100_dot
-        output[51] = x20000_dot
-        output[52] = x20010_dot
-        output[53] = x20011_dot
-        output[54] = x20100_dot
-        output[55] = x20110_dot
-        output[56] = x20111_dot
-        output[57] = x21000_dot
-        output[58] = x21010_dot
-        output[59] = x21011_dot
-        output[60] = x21100_dot
-        output[61] = x21110_dot
-        output[62] = x21111_dot
-        output[63] = x22000_dot
-        output[64] = x22010_dot
-        output[65] = x22011_dot
-        output[66] = x22100_dot
-        output[67] = x22110_dot
-        output[68] = x22111_dot
-        output[69] = x30000_dot
-        output[70] = x30100_dot
-        output[71] = x30200_dot
-        output[72] = x30300_dot
-        output[73] = x40000_dot
-        output[74] = x40010_dot
-        output[75] = x40011_dot
-        output[76] = x40100_dot
-        output[77] = x40110_dot
-        output[78] = x40111_dot
-        output[79] = x40200_dot
-        output[80] = x40210_dot
-        output[81] = x40211_dot
-        output[82] = x40300_dot
-        output[83] = x40310_dot
-        output[84] = x40311_dot
-        output[85] = x41000_dot
-        output[86] = x41010_dot
-        output[87] = x41011_dot
-        output[88] = x41100_dot
-        output[89] = x41110_dot
-        output[90] = x41111_dot
-        output[91] = x41200_dot
-        output[92] = x41210_dot
-        output[93] = x41211_dot
-        output[94] = x41300_dot
-        output[95] = x41310_dot
-        output[96] = x41311_dot
-        output[97] = x42000_dot
-        output[98] = x42010_dot
-        output[99] = x42011_dot
-        output[100] = x42100_dot
-        output[101] = x42110_dot
-        output[102] = x42111_dot
-        output[103] = x42200_dot
-        output[104] = x42210_dot
-        output[105] = x42211_dot
-        output[106] = x42300_dot
-        output[107] = x42310_dot
-        output[108] = x42311_dot
-        output[109] = x50000_dot
-        output[110] = x50010_dot
-        output[111] = x50011_dot
-        output[112] = x50100_dot
-        output[113] = x50110_dot
-        output[114] = x50111_dot
-        output[115] = x50200_dot
-        output[116] = x50210_dot
-        output[117] = x50211_dot
-        output[118] = x50300_dot
-        output[119] = x50310_dot
-        output[120] = x50311_dot
-        output[121] = x51000_dot
-        output[122] = x51010_dot
-        output[123] = x51011_dot
-        output[124] = x51100_dot
-        output[125] = x51110_dot
-        output[126] = x51111_dot
-        output[127] = x51200_dot
-        output[128] = x51210_dot
-        output[129] = x51211_dot
-        output[130] = x51300_dot
-        output[131] = x51310_dot
-        output[132] = x51311_dot
-        output[133] = x52000_dot
-        output[134] = x52010_dot
-        output[135] = x52011_dot
-        output[136] = x52100_dot
-        output[137] = x52110_dot
-        output[138] = x52111_dot
-        output[139] = x52200_dot
-        output[140] = x52210_dot
-        output[141] = x52211_dot
-        output[142] = x52300_dot
-        output[143] = x52310_dot
-        output[144] = x52311_dot
-        output[145] = x60000_dot
-        output[146] = x60010_dot
-        output[147] = x60011_dot
-        output[148] = x60100_dot
-        output[149] = x60110_dot
-        output[150] = x60111_dot
-        output[151] = x60200_dot
-        output[152] = x60210_dot
-        output[153] = x60211_dot
-        output[154] = x60300_dot
-        output[155] = x60310_dot
-        output[156] = x60311_dot
-        output[157] = x61000_dot
-        output[158] = x61010_dot
-        output[159] = x61011_dot
-        output[160] = x61100_dot
-        output[161] = x61110_dot
-        output[162] = x61111_dot
-        output[163] = x61200_dot
-        output[164] = x61210_dot
-        output[165] = x61211_dot
-        output[166] = x61300_dot
-        output[167] = x61310_dot
-        output[168] = x61311_dot
-        output[169] = x62000_dot
-        output[170] = x62010_dot
-        output[171] = x62011_dot
-        output[172] = x62100_dot
-        output[173] = x62110_dot
-        output[174] = x62111_dot
-        output[175] = x62200_dot
-        output[176] = x62210_dot
-        output[177] = x62211_dot
-        output[178] = x62300_dot
-        output[179] = x62310_dot
-        output[180] = x62311_dot
+
+        output[0] = GR_dot
+        output[1] = G_dot
+        output[2] = GrR_dot
+        output[3] = Gr_dot
+        output[4] = GcR_dot
+        output[5] = Gc_dot
+        output[6] = GBR_dot
+        output[7] = GB_dot
+        output[8] = GBRb_dot
+        output[9] = GBb_dot
+        output[10] = MnPo_dot
+        output[11] = McPo_dot
+        output[12] = MnPt_dot
+        output[13] = McPt_dot
+        output[14] = MnRt_dot
+        output[15] = McRt_dot
+        output[16] = MnRev_dot
+        output[17] = McRev_dot
+        output[18] = MnRo_dot
+        output[19] = McRo_dot
+        output[20] = MnB_dot
+        output[21] = McB_dot
+        output[22] = MnNp_dot
+        output[23] = McNp_dot
+        output[24] = B_dot
+        output[25] = Cl_dot
+        output[26] = BC_dot
+        output[27] = cyrev_dot
+        output[28] = revn_dot
+        output[29] = cyrevg_dot
+        output[30] = revng_dot
+        output[31] = cyrevgp_dot
+        output[32] = revngp_dot
+        output[33] = cyrevp_dot
+        output[34] = revnp_dot
+        output[35] = gto_dot
+        output[36] = x00001_dot
+        output[37] = x00011_dot
+        output[38] = x00100_dot
+        output[39] = x00110_dot
+        output[40] = x00200_dot
+        output[41] = x00210_dot
+        output[42] = x01000_dot
+        output[43] = x01010_dot
+        output[44] = x01011_dot
+        output[45] = x02000_dot
+        output[46] = x02010_dot
+        output[47] = x02011_dot
+        output[48] = x10000_dot
+        output[49] = x10100_dot
+        output[50] = x20000_dot
+        output[51] = x20010_dot
+        output[52] = x20011_dot
+        output[53] = x20100_dot
+        output[54] = x20110_dot
+        output[55] = x20111_dot
+        output[56] = x21000_dot
+        output[57] = x21010_dot
+        output[58] = x21011_dot
+        output[59] = x21100_dot
+        output[60] = x21110_dot
+        output[61] = x21111_dot
+        output[62] = x22000_dot
+        output[63] = x22010_dot
+        output[64] = x22011_dot
+        output[65] = x22100_dot
+        output[66] = x22110_dot
+        output[67] = x22111_dot
+        output[68] = x30000_dot
+        output[69] = x30100_dot
+        output[70] = x30200_dot
+        output[71] = x30300_dot
+        output[72] = x40000_dot
+        output[73] = x40010_dot
+        output[74] = x40011_dot
+        output[75] = x40100_dot
+        output[76] = x40110_dot
+        output[77] = x40111_dot
+        output[78] = x40200_dot
+        output[79] = x40210_dot
+        output[80] = x40211_dot
+        output[81] = x40300_dot
+        output[82] = x40310_dot
+        output[83] = x40311_dot
+        output[84] = x41000_dot
+        output[85] = x41010_dot
+        output[86] = x41011_dot
+        output[87] = x41100_dot
+        output[88] = x41110_dot
+        output[89] = x41111_dot
+        output[90] = x41200_dot
+        output[91] = x41210_dot
+        output[92] = x41211_dot
+        output[93] = x41300_dot
+        output[94] = x41310_dot
+        output[95] = x41311_dot
+        output[96] = x42000_dot
+        output[97] = x42010_dot
+        output[98] = x42011_dot
+        output[99] = x42100_dot
+        output[100] = x42110_dot
+        output[101] = x42111_dot
+        output[102] = x42200_dot
+        output[103] = x42210_dot
+        output[104] = x42211_dot
+        output[105] = x42300_dot
+        output[106] = x42310_dot
+        output[107] = x42311_dot
+        output[108] = x50000_dot
+        output[109] = x50010_dot
+        output[110] = x50011_dot
+        output[111] = x50100_dot
+        output[112] = x50110_dot
+        output[113] = x50111_dot
+        output[114] = x50200_dot
+        output[115] = x50210_dot
+        output[116] = x50211_dot
+        output[117] = x50300_dot
+        output[118] = x50310_dot
+        output[119] = x50311_dot
+        output[120] = x51000_dot
+        output[121] = x51010_dot
+        output[122] = x51011_dot
+        output[123] = x51100_dot
+        output[124] = x51110_dot
+        output[125] = x51111_dot
+        output[126] = x51200_dot
+        output[127] = x51210_dot
+        output[128] = x51211_dot
+        output[129] = x51300_dot
+        output[130] = x51310_dot
+        output[131] = x51311_dot
+        output[132] = x52000_dot
+        output[133] = x52010_dot
+        output[134] = x52011_dot
+        output[135] = x52100_dot
+        output[136] = x52110_dot
+        output[137] = x52111_dot
+        output[138] = x52200_dot
+        output[139] = x52210_dot
+        output[140] = x52211_dot
+        output[141] = x52300_dot
+        output[142] = x52310_dot
+        output[143] = x52311_dot
+        output[144] = x60000_dot
+        output[145] = x60010_dot
+        output[146] = x60011_dot
+        output[147] = x60100_dot
+        output[148] = x60110_dot
+        output[149] = x60111_dot
+        output[150] = x60200_dot
+        output[151] = x60210_dot
+        output[152] = x60211_dot
+        output[153] = x60300_dot
+        output[154] = x60310_dot
+        output[155] = x60311_dot
+        output[156] = x61000_dot
+        output[157] = x61010_dot
+        output[158] = x61011_dot
+        output[159] = x61100_dot
+        output[160] = x61110_dot
+        output[161] = x61111_dot
+        output[162] = x61200_dot
+        output[163] = x61210_dot
+        output[164] = x61211_dot
+        output[165] = x61300_dot
+        output[166] = x61310_dot
+        output[167] = x61311_dot
+        output[168] = x62000_dot
+        output[169] = x62010_dot
+        output[170] = x62011_dot
+        output[171] = x62100_dot
+        output[172] = x62110_dot
+        output[173] = x62111_dot
+        output[174] = x62200_dot
+        output[175] = x62210_dot
+        output[176] = x62211_dot
+        output[177] = x62300_dot
+        output[178] = x62310_dot
+        output[179] = x62311_dot
 
         return output
 
+def main(save_plots: bool = False):
+    model = ForgerKimModel()
+    t, y = model.simulate(t_end=100, num_points=10_000)
+
+    if save_plots:
+        import matplotlib.pyplot as plt
+        plot_index = 0
+        for plot_index in range(y.shape[0]):
+            print_index = plot_index + 1
+            print("saving plot", print_index, f"of 180 ({print_index/180*100:.2f}%)")
+            plt.plot(t, y[plot_index])
+            plt.savefig(f'y_{plot_index}.png')
+            plt.close()
+    
+    print("done")
+    return t, y
+
+
+if __name__ == "__main__":
+    main(save_plots=True)
